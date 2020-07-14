@@ -41,6 +41,12 @@ button{
  font-size: 26px;
 }
 
+.submit{
+ background-color: rgb(169, 170, 245);
+ font-weight: 700;
+ font-size: 26px;
+}
+
 .questions{
   background-color: rgb(237, 236, 232);
   max-width: 1000px;
@@ -65,3 +71,5 @@ display: none
    font-size: 2em;
   }
 }
+
+
