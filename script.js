@@ -1,6 +1,6 @@
 
 //database for questions
-const quizQuestions = [
+const STORE = [
     {
   
       question: 'What is the world`s largest continent?',
@@ -25,7 +25,7 @@ const quizQuestions = [
        ],
        correctAnswer: 'Algeria'
     }, 
-     {
+    {
       question: 'What is the largest country by area in the World? ',
       answers: [
         'Turkey',
@@ -129,38 +129,43 @@ let errorMessage="";
 
   //creating HTML for quiz questions
  function startPage(){
-    return ` <main>
-       <section class="start-page">
-       <div class="intro">
-        <h2>Around the World in 10 questions</h2>
-         <p>How well do you know the World Geography?</p>
-         </div>
-       <fieldset>
-       <section class="response"> </section>
-       <div class="questions">
-         <button type="button" id="start"> Start Quiz</button>
-       </div>
-       <div class = "answers">
-       </div>
-        <section class="quiz-questions"> <br> 
-         </section>
-         <button class="submit"> Submit </button>
-       </section>
-       </fieldset>
-     <section class="results-page">
-         <p class="final-score"></p>
-         <button class="try-again-button">Try Again</button>
-       </section>
-       <div id="dialog" title="Error Message">
-  <p> Please select an answer to continue</p>
-</div>
-     </main>`
+    return ` 
+    <main>
+        <section class="start-page">
+          <div class="intro">
+            <h2>Around the World in 10 questions</h2>
+            <p>How well do you know the World Geography?</p>
+          </div>
+          <section class="response"> </section>
+          <form>
+            <div class="questions">
+              <button type="button" id="start"> Start Quiz</button>
+            </div>
+            <div class = "answers">
+            </div>
+            <section class="quiz-questions"> <br> 
+            </section>
+            <input type="submit" value="Submit" class="submit"> 
+          </form>
+        </section>
+      <section class="results-page">
+          <p class="final-score"></p>
+          <button class="try-again-button">Try Again</button>
+      </section>
+      <div id="dialog" title="Error Message">
+        <p> Please select an answer to continue</p>
+      </div>
+    </main>`
   }
  
 
 function renderStartPage(){
+  $("submit").on("click", (event)=>{
+    event.preventDefault();
+  });
   $('.main-content').html(startPage())
   $('.results-page, .submit').addClass('hidden');
+  startQuiz();
 }
 
 function startQuiz(){
@@ -168,14 +173,14 @@ function startQuiz(){
    $('.intro').addClass('hidden');
    $('.submit').removeClass('hidden');
    getCurrentQuestion(0);
-   $('.questionNumber').html((currentQuestion+1)+"/"+quizQuestions.length);
+   $('.questionNumber').html((currentQuestion+1)+"/"+STORE.length);
   });
 }
 
 function getCurrentQuestion(count){
-  if(currentQuestion<quizQuestions.length){
-  question = quizQuestions[count]["question"];
-  var answers = quizQuestions[count]["answers"];
+  if(currentQuestion<STORE.length){
+  question = STORE[count]["question"];
+  var answers = STORE[count]["answers"];
        renderQuestionandAnswers(question, answers);
     }
     else{   
@@ -186,9 +191,10 @@ function getCurrentQuestion(count){
 // Choose one of the options: 
 function selectedAnswer(){
   $('.submit').on('click',function(event){
+    event.preventDefault();
     let selectedOption = $('input[type=radio]:checked').val();
     console.log(selectedOption);
-    if(currentQuestion === quizQuestions.length -1){
+    if(currentQuestion === STORE.length -1){
       $('.submit').addClass('hidden');
       finalFeedback();
     }
@@ -207,12 +213,12 @@ function selectedAnswer(){
     }
     currentQuestion++;
     getCurrentQuestion(currentQuestion);
-    $('.questionNumber').html((currentQuestion+1)+"/"+quizQuestions.length);
+    $('.questionNumber').html((currentQuestion)+"/"+STORE.length);
  });
 } 
 
 function verifyAnswer(selected){
-  let rightAnswer = quizQuestions[currentQuestion].correctAnswer;
+  let rightAnswer = STORE[currentQuestion].correctAnswer;
   if(selected === rightAnswer){
     correctAnswer();
   } 
@@ -239,25 +245,26 @@ function updateScore() {
 function wrongAnswer() {
   $('.response').html(
    `<p>Wrong answer! The correct answer is:
-    ${quizQuestions[currentQuestion].correctAnswer}</p>`
+    ${STORE[currentQuestion].correctAnswer}</p>`
   );
 }
 
  //displaying the current question number: 
- $('.next-question').on('click', '.next-button', function(){
+ /*$('.next-question').on('click', '.next-button', function(){
  function updateQuestion() {
+   console.log("currentQuestion:"+currentQuestion);
    const html = $(`<ul>
-       <li id="js-answered">Questions Number: ${quizQuestions.currentQuestion + 1}/${quizQuestions.questions.length}</li>
-     <li id="js-score">Score: ${quizQuestions.score}/${quizQuestions.questions.length}</li>
+       <li id="js-answered">Questions Number: ${STORE.currentQuestion}/${STORE.questions.length}</li>
+     <li id="js-score">Score: ${STORE.score}/${STORE.questions.length}</li>
      </ul>`);
    $(".questionNumber").html(html);
    }
- }); 
+ }); */
 
 function nextQuestion(){
   $('.next-button').on('click', function(event){
-   var question = quizQuestions[i]["question"];
-   var answers = quizQuestions[i]["answers"];
+   var question = STORE[i]["question"];
+   var answers = STORE[i]["answers"];
     renderQuestionandAnswers(question, answers);
   });
 } 
@@ -279,7 +286,6 @@ function finalFeedback() {
   $('.response').html('Final Score:');
   $('.questions').html(`You got ${currentScore}/10 questions right!`);
 
-
   $('.submit').on('click', function() {
       $('.quizQuestions').addClass('hidden');
       $('.results-page').removeClass('hidden');
@@ -290,9 +296,12 @@ function finalFeedback() {
     function tryAgain(){
       $('.main-content').on('click', '.try-again-button',(event)=>{
        renderStartPage();
+       startQuiz();
+       selectedAnswer();
        resetCounters();
       });
     }
+
    //reset question number and score to 0:
    function resetCounters(){
      currentQuestion = 0;
